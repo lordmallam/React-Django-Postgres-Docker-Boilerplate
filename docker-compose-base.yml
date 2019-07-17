@@ -1,0 +1,47 @@
+version: '2.1'
+
+services:
+  db-base:
+    image: postgres
+    environment:
+      PGUSER: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  api-base:
+    build: ./backend
+    environment:
+      DB_NAME: ${DB_NAME}
+      PGHOST: db
+      PGPASSWORD: ${DB_PASSWORD}
+      PGPORT: 5432
+      PGUSER: postgres
+
+      ADMIN_USERNAME: ${API_ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${API_ADMIN_PASSWORD}
+      ADMIN_EMAIL: ${API_ADMIN_EMAIL}
+      ADMIN_TOKEN: ${API_ADMIN_TOKEN}
+
+      STATIC_URL: /static/
+      WEB_SERVER_PORT: ${API_WEB_SERVER_PORT}
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    command: start_dev
+
+  ui-base:
+    build: ./ui
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./ui:/app
+      - ./ui/node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    command: start_dev
