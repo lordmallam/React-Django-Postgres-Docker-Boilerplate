@@ -5,6 +5,7 @@ This is a set up so that we can easily create apps that use  React (set up with 
 ## Running
 
 1. `./scripts/docker_start.sh --build`
+
 1. There should now be two servers running:
   - [http://127.0.0.1:8000](http://127.0.0.1:8000) is the Django (API) app
   - [http://127.0.0.1:3000](http://127.0.0.1:3000) is the React (UI) app
