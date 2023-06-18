@@ -1,10 +1,11 @@
-version: '2.1'
+version: '3'
 
 services:
   db-base:
-    image: postgres
+    image: postgres:15.3-alpine3.18
     environment:
       PGUSER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
     healthcheck:
@@ -36,12 +37,12 @@ services:
     command: start_dev
 
   ui-base:
-    build: ./ui
+    build: ./frontend
     environment:
       - NODE_ENV=development
     volumes:
-      - ./ui:/app
-      - ./ui/node_modules:/app/node_modules
+      - ./frontend:/app
+      - ./frontend/node_modules:/app/node_modules
     ports:
       - "3000:3000"
     command: start_dev

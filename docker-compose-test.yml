@@ -1,14 +1,14 @@
-version: '2.1'
+version: '3'
 
 services:
   db-test:
     extends:
       file: ./docker-compose-base.yml
       service: db-base
-  django-test:
+  api-test:
     extends:
       file: ./docker-compose-base.yml
-      service: django-base
+      service: api-base
     depends_on:
       db-test:
         condition: service_healthy
@@ -16,7 +16,7 @@ services:
   frontend-test:
     extends:
       file: ./docker-compose-base.yml
-      service: frontend-base
+      service: ui-base
     environment:
       TESTING: "true"
     command: test

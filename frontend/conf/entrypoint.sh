@@ -60,6 +60,10 @@ case "$1" in
         #     sleep 5
         #     echo "waiting..."
         # done
+        npm run dev
+    ;;
+
+    start_prod )
         npm run start
     ;;
 
