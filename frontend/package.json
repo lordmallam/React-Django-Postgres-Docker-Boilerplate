@@ -1,5 +1,5 @@
 {
-  "name": "projectx",
+  "name": "tarok",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,7 +18,7 @@
     "eslint-config-next": "13.4.6",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "next": "13.4.6",
+    "next": "^14.2.10",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-select": "^5.7.3",

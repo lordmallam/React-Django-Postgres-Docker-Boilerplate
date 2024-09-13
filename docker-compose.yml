@@ -1,17 +1,14 @@
-version: '3'
-
 networks:
   # docker network create ${NETWORK_NAME}
   internal:
-    external:
-      # if this isn't explicitly set it inherits from the containing folder name (aether or not)
-      name: ${NETWORK_NAME}
+    external: true
+    name: ${NETWORK_NAME}
 
 volumes:
   # docker volume create ${DB_VOLUME}
   database_data:
-    external:
-      name: ${DB_VOLUME}
+    external: true
+    name: ${DB_VOLUME}
 
 services:
   db:

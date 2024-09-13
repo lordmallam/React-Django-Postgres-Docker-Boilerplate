@@ -143,11 +143,22 @@ if [[ $build = "yes" ]]; then
     echo ""
 fi
 
-docker network rm ${NETWORK_NAME} || true
-{
-    docker network create ${NETWORK_NAME}
-} || true
+# Check if the network exists
+if docker network inspect "${NETWORK_NAME}" > /dev/null 2>&1; then
+    # Remove the network if it exists
+    # echo "Removing existing network: ${NETWORK_NAME}"
+    # docker network rm "${NETWORK_NAME}"
+    echo "Network ${NETWORK_NAME} already exists, skipping creation."
+else
+    # echo "Network ${NETWORK_NAME} does not exist, skipping removal."
+    # Create the network
+    echo "Creating network: ${NETWORK_NAME}"
+    docker network create "${NETWORK_NAME}"
+fi
+
+# Confirm the network is ready
 echo "${NETWORK_NAME} network is ready."
+
 
 
 # check that the volume exists or create it

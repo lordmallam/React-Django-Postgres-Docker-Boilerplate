@@ -34,7 +34,7 @@ echo_message "Preparing $1 container"
 build_container $1
 echo_message "$1 ready!"
 
-if [[ $1 == "django" ]]; then
+if [[ $1 == "backend" ]]; then
     $DC_TEST run --rm "$1"-test test
 fi
 

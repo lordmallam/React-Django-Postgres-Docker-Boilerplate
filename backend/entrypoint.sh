@@ -9,12 +9,71 @@ function show_help {
     bash          : run bash
     eval          : eval shell command
     manage        : invoke django manage.py commands
+
+    pip_freeze    : freeze pip dependencies and write to requirements.txt
+
+    backup_db     : creates db dump (${BACKUPS_FOLDER}/${DB_NAME}-backup-{timestamp}.sql)
+    restore_dump  : restore db dump (${BACKUPS_FOLDER}/${DB_NAME}-backup.sql)
+
     test          : run tests
     test_lint     : run flake8 tests
     test_coverage : run tests with coverage output
     test_py       : alias of test_coverage
+
     start_dev     : start Django server for development
     """
+}
+
+function pip_freeze {
+    local VENV=/tmp/env
+    rm -rf ${VENV}
+    mkdir -p ${VENV}
+    python3 -m venv ${VENV}
+
+    ${VENV}/bin/pip install -q \
+        -r conf/pip/primary_requirements.txt \
+        --upgrade
+
+    cat conf/pip/requirements_header.txt | tee conf/pip/requirements.txt
+    ${VENV}/bin/pip freeze --local | grep -v appdir | tee -a conf/pip/requirements.txt
+}
+
+function backup_db {
+    pg_isready
+
+    if psql -c "" $DB_NAME; then
+        echo "$DB_NAME database exists!"
+
+        mkdir -p $BACKUPS_FOLDER
+        local BACKUP_FILE=$BACKUPS_FOLDER/$DB_NAME-backup-$(date "+%Y%m%d%H%M%S").sql
+
+        pg_dump $DB_NAME > $BACKUP_FILE
+        chown -f trisiki:trisiki $BACKUP_FILE
+        echo "$DB_NAME database backup created in [$BACKUP_FILE]."
+    fi
+}
+
+function restore_db {
+    pg_isready
+
+    # backup current data
+    backup_db
+
+    # delete DB is exists
+    if psql -c "" $DB_NAME; then
+        dropdb -e $DB_NAME
+        echo "$DB_NAME database deleted."
+    fi
+
+    createdb -e $DB_NAME -e ENCODING=UTF8
+    echo "$DB_NAME database created."
+
+    # load dump
+    psql -e $DB_NAME < ${BACKUPS_FOLDER}/${DB_NAME}-backup.sql
+    echo "$DB_NAME database dump restored."
+
+    # migrate data model if needed
+    ./manage.py migrate --noinput
 }
 
 
@@ -46,7 +105,8 @@ function test_lint {
 }
 
 function test_coverage {
-    rm -R /app/.coverage* 2>/dev/null || true
+    coverage erase || true
+    rm -R /code/.coverage* 2>/dev/null || true
 
     coverage run \
         --concurrency=multiprocessing \
@@ -59,7 +119,7 @@ function test_coverage {
     coverage report
     coverage erase
 
-    echo "Good Job ************ Good Job"
+    cat /code/conf/extras/good_job.txt
 }
 
 case "$1" in
@@ -71,8 +131,20 @@ case "$1" in
         eval "${@:2}"
     ;;
 
+    pip_freeze )
+        pip_freeze
+    ;;
+
     setup )
         setup
+    ;;
+
+    backup_db )
+        backup_db
+    ;;
+
+    restore_dump )
+        restore_db
     ;;
 
     manage )

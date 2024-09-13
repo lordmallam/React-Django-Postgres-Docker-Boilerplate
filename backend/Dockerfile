@@ -1,17 +1,31 @@
-FROM python:3.10
+FROM python:3.12-slim
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
+COPY ./conf/docker/* /tmp/
+RUN /tmp/setup.sh
 
-WORKDIR /app
-COPY requirements.txt /app
-RUN pip install -q --upgrade pip && \
-    pip install -q -r requirements.txt
+WORKDIR /code
 
-COPY ./ /app
-RUN useradd -ms /bin/false trisiki
-RUN chown -R trisiki: /app
+ENTRYPOINT ["/code/entrypoint.sh"]
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+COPY --chown=trisiki:trisiki ./conf/pip /code/conf/pip
+
+ENV VIRTUAL_ENV=/var/run/trisiki/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN mkdir -p $VIRTUAL_ENV && \
+    python3 -m venv $VIRTUAL_ENV && \
+    pip install -q --upgrade pip && \
+    pip install -q -r /code/conf/pip/requirements.txt
+
+COPY --chown=trisiki:trisiki ./ /code
+
+################################################################################
+## create application version and revision files
+################################################################################
+
+ARG VERSION=0.0.0
+ARG GIT_REVISION
+
+RUN mkdir -p /var/tmp && \
+    echo $VERSION > /var/tmp/VERSION && \
+    echo $GIT_REVISION > /var/tmp/REVISION
