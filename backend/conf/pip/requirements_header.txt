@@ -1,0 +1,13 @@
+################################################################################
+#
+#                              Frozen requirements
+#
+#                               DO NOT CHANGE !!!
+#
+# To check the outdated dependencies run
+#     docker compose run --rm --no-deps api eval pip list --outdated
+#
+# To update this run
+#     docker compose run --rm --no-deps api pip_freeze
+#
+################################################################################

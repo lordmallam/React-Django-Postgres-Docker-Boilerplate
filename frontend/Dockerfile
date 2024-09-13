@@ -11,7 +11,7 @@ RUN apt-get update -qq && \
 WORKDIR /app/
 COPY ./package.json /app/package.json
 
-RUN npm install -q
+RUN npm install
 
 RUN apt-get autoremove && apt-get clean
 
