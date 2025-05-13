@@ -21,6 +21,8 @@ function show_help {
     test_py       : alias of test_coverage
 
     start_dev     : start Django server for development
+
+    make_migration: make migration files
     """
 }
 
@@ -122,6 +124,10 @@ function test_coverage {
     cat /code/conf/extras/good_job.txt
 }
 
+function make_migration {
+    ./manage.py makemigrations
+}
+
 case "$1" in
     bash )
         bash
@@ -169,6 +175,10 @@ case "$1" in
         export DEBUG=true
         setup
         ./manage.py runserver 0.0.0.0:$WEB_SERVER_PORT
+    ;;
+
+    make_migration )
+        make_migration
     ;;
 
     help )

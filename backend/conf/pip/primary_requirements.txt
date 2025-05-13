@@ -6,6 +6,8 @@ Django
 django-rest-auth
 djangorestframework
 djangorestframework-simplejwt
+dj-rest-auth[with_social]
+django-allauth
 flake8
 flake8-quotes
 idna
